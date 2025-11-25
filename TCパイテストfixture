@@ -1,0 +1,147 @@
+"""Test sample file"""
+# ↑ このファイルの説明（Docstring）
+
+# pytestをインポート（テストフレームワーク）
+import pytest
+
+# Homeページを操作するクラスをインポート
+from skynete_p_rnps_home_Lib.pom.home import Home
+# Settingsページを操作するクラスをインポート
+from skynete_p_rrps_settings_lib.pom.settings import Settings
+
+
+# テストクラスを定義（Pytestが自動で見つける）
+class TestSampleClass:
+    """
+    Test sample class
+    # ↑ クラスの説明
+    """
+    
+    # fixtureを定義（デコレーター）
+    @pytest.fixture(scope="function")  # scope="function" = 各テスト関数ごとに実行
+    def fixture_function1(self):  # selfは必要（クラス内のメソッドだから）
+        """
+        Fixture function1
+        # ↑ fixtureの説明
+        """
+        # テスト実行前に実行される（セットアップ）
+        print("function1 precondition")
+        
+        # yieldで一時停止（この間にテストが実行される）
+        yield
+        
+        # テスト実行後に実行される（ティアダウン）
+        print("function1 teardown")
+        
+    # 2つ目のfixture定義
+    @pytest.fixture(scope="function")  # 各テスト関数ごとに実行
+    def fixture_function2(self):
+        """
+        Fixture function2
+        """
+        # セットアップ処理
+        print("function2 precondition")
+        # テスト実行
+        yield
+        # ティアダウン処理
+        print("function2 teardown")
+    
+    # 3つ目のfixture定義
+    @pytest.fixture(scope="function")
+    def fixture_function3(self):
+        """
+        Fixture function3
+        """
+        print("function3 precondition")
+        yield
+        print("function3 teardown")
+        
+    # 4つ目のfixture定義
+    @pytest.fixture(scope="function")
+    def fixture_function4(self):
+        """
+        Fixture function4
+        """
+        print("function4 precondition")
+        yield
+        print("function4 teardown")
+    
+    # テスト関数1（test_で始まる必要がある）
+    def test_sample1(self, driver):  # driverはconftest.pyから自動で渡される
+        """
+        Test Sample1 method.
+        # ↑ テストの説明
+        """
+        # Homeページを操作するオブジェクトを作成
+        # self = このテストクラスのインスタンス
+        # driver = Seleniumのブラウザドライバー
+        self.home = Home(self, driver)
+        
+        # Settingsページを操作するオブジェクトを作成
+        self.settings = Settings(self, driver)
+        
+        # Homeページを開く
+        # ↓ コメント（実行されない）
+        # Homeページを開く
+        self.home.open()  # ブラウザでHomeページにアクセス
+        
+        # assertで条件をチェック（Falseなら失敗）
+        # self.home.wait_for_page() = ページ読み込み完了を待つ（TrueかFalseを返す）
+        # , の後ろはエラーメッセージ（失敗時に表示）
+        assert self.home.wait_for_page(), "Homeページの読み込みに失敗しました"
+        
+        # Settingsを開く
+        # ↓ コメント
+        # Settingsを開く
+        self.settings.open()  # Settingsページを開く
+        
+        # Settingsを閉じる
+        # ↓ コメント
+        # Settingsを閉じる
+        self.settings.close()  # Settingsページを閉じる
+        
+        # トップページに戻ったことを確認
+        # ↓ コメント
+        # トップページに戻ったことを確認
+        # self.settings.top = トップページのオブジェクト
+        # .wait_for_page() = ページ読み込み完了を待つ
+        assert self.settings.top.wait_for_page(), "トップページへの遷移に失敗しました"
+        
+    # テスト関数2
+    def test_sample2(self):  # driverを使わないテスト
+        """
+        Test Sample2 method.
+        """
+        # 単純なプリント文（デバッグ用）
+        print("test_sample2")
+
+
+# 2つ目のテストクラス（fixtureの使用例）
+# コメント（クラスの説明）
+# fixtureを使用するテストの例
+class TestWithFixtures:
+    """
+    Fixtureを使用したテストクラスの例
+    """
+    
+    # テスト関数（fixture_function1を使う）
+    # fixture_function1は引数に書くだけで自動で実行される
+    def test_with_fixture1(self, fixture_function1):
+        """
+        fixture_function1を使用するテスト
+        """
+        # プリント文
+        print("test_with_fixture1 実行中")
+        # 常に成功するテスト
+        assert True  # Trueなので必ず成功
+        
+    # 複数のfixtureを使うテスト
+    def test_with_multiple_fixtures(self, fixture_function1, fixture_function2):
+        """
+        複数のfixtureを使用するテスト
+        # ↑ 説明：fixture_function1とfixture_function2の両方を使う
+        """
+        # プリント文
+        print("test_with_multiple_fixtures 実行中")
+        # 常に成功
+        assert True
