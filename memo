@@ -1,0 +1,103 @@
+## 重要な部分を図解
+
+### 1. fixture の動き
+
+```python
+@pytest.fixture(scope="function")
+def fixture_function1(self):
+    print("function1 precondition")  # ← テスト前
+    yield                            # ← ここでテスト実行
+    print("function1 teardown")      # ← テスト後
+```
+
+**実行順序:**
+```
+1. function1 precondition
+2. テスト実行（例：test_with_fixture1）
+3. function1 teardown
+```
+
+### 2. テスト関数とfixture
+
+```python
+def test_with_fixture1(self, fixture_function1):
+#                            ^^^^^^^^^^^^^^^^
+#                            名前を書くだけで自動実行
+```
+
+**Pytestがすること:**
+1. `fixture_function1`という名前を見つける
+2. 上のクラスで定義されたfixtureを探す
+3. 見つからなければconftest.pyを探す
+4. 自動で実行してテストに渡す
+
+### 3. assert の意味
+
+```python
+assert self.home.wait_for_page(), "Homeページの読み込みに失敗しました"
+#      ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#      この条件がTrueか？        Falseの時のメッセージ
+```
+
+**動作:**
+- True → テスト成功
+- False → テスト失敗（メッセージを表示）
+
+### 4. self, driver の意味
+
+```python
+def test_sample1(self, driver):
+#                ^^^^  ^^^^^^
+#                |     conftest.pyから自動で渡される
+#                このクラスのインスタンス
+```
+
+### 5. scope="function" の意味
+
+```python
+@pytest.fixture(scope="function")
+#                     ^^^^^^^^
+#                     各テストごとに実行
+```
+
+**scope の種類:**
+- `"function"` = 各テスト関数ごと（デフォルト）
+- `"class"` = クラスごとに1回
+- `"module"` = ファイルごとに1回
+- `"session"` = 全テストで1回
+
+これで全ての行の意味がわかりますね！🎯
+
+
+テストの実行フローを図解します！完全な実行フローを図解しました！
+
+## 最も重要な3つのポイント
+
+### 1. **Fixtureの実行タイミング**
+```
+セットアップ (yield前)
+    ↓
+テスト実行
+    ↓
+ティアダウン (yield後)
+```
+
+### 2. **複数fixtureは後入れ先出し**
+```
+fixture1 開始
+  → fixture2 開始
+    → テスト実行
+  → fixture2 終了
+→ fixture1 終了
+```
+
+### 3. **assertが失敗したら**
+```
+assert失敗
+  ↓
+以降のコードはスキップ
+  ↓
+でもfixtureのティアダウンは実行される
+```
+
+わからない部分があれば教えてください！
